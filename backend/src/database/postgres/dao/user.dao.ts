@@ -1,7 +1,7 @@
-import { BaseUser, User } from '../../models/user';
-import { UserDao } from '../dao';
+import { BaseUser, User } from '../../../models/user';
+import { UserDao } from '../../dao';
 
-export class UserPgDao implements UserDao {
+export class PgUserDao implements UserDao {
   create(entity: BaseUser): User {
     throw new Error('Method not implemented.');
   }

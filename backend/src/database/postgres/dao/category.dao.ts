@@ -1,7 +1,7 @@
-import { BaseCategory, Category } from '../../models/category';
-import { CategoryDao } from '../dao';
+import { BaseCategory, Category } from '../../../models/category';
+import { CategoryDao } from '../../dao';
 
-export class CategoryPgDao implements CategoryDao {
+export class PgCategoryDao implements CategoryDao {
   create(entity: BaseCategory): Category {
     throw new Error('Method not implemented.');
   }

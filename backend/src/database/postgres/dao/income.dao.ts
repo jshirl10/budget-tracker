@@ -1,7 +1,7 @@
-import { BaseIncome, Income } from '../../models/income';
-import { IncomeDao } from '../dao';
+import { BaseIncome, Income } from '../../../models/income';
+import { IncomeDao } from '../../dao';
 
-export class IncomePgDao implements IncomeDao {
+export class PgIncomeDao implements IncomeDao {
   create(entity: BaseIncome): Income {
     throw new Error('Method not implemented.');
   }

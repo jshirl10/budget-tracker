@@ -1,8 +1,12 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import { categoryRouter } from './routes/category.routes';
 import { expenseRouter } from './routes/expense.routes';
 import { incomeRouter } from './routes/income.routes';
 import { userRouter } from './routes/user.routes';
+
+// loads the vars in ./.env file
+dotenv.config();
 
 const app = express();
 const port = 3001;
