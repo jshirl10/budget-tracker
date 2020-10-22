@@ -1,5 +1,8 @@
 import express from 'express';
 
+/**
+ * A router for all paths beginning with /users
+ */
 const userRouter = express.Router({ mergeParams: true });
 
 userRouter.post('/', (req, res) => {
