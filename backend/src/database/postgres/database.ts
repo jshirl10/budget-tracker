@@ -1,7 +1,7 @@
 import { Pool, PoolClient, QueryConfig, QueryResult, types } from 'pg';
 
 // For when query results parse postgres types to typescript types
-const INT = 23;
+const INT = 23; // TODO explain what these numbers mean
 const DOUBLE_PRECISION = 701;
 types.setTypeParser(INT, parseInt);
 types.setTypeParser(DOUBLE_PRECISION, parseFloat);
