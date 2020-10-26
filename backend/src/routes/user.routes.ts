@@ -18,8 +18,11 @@ userRouter.post('/', async (req, res) => {
     unallocated_funds: 0,
   };
   const db = DatabaseFactory.getDatabase();
-  const user = await db.addUser(newUser);
-  res.send(user);
+  try {
+    const user = await db.addUser(newUser);
+  } catch (error) {
+    res.send(error.message);
+  }
 });
 
 userRouter.get('/:userId', (req, res) => {

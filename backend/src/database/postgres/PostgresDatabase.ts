@@ -26,6 +26,7 @@ export class PgDatabase implements Database {
     action: (c: PoolClient, commit: () => Promise<void>, rollback: () => Promise<void>) => Promise<T>,
   ): Promise<T> {
     const client = await PgDatabase.pool.connect();
+    await client.query('BEGIN');
     const transactionResult = action(
       client,
       async () => {
@@ -70,7 +71,7 @@ export class PgDatabase implements Database {
         return createdUser;
       } catch (error) {
         await rollback();
-        throw new Error('Something went wrong');
+        throw error;
       }
     });
   }
