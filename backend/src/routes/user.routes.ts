@@ -20,6 +20,7 @@ userRouter.post('/', async (req, res) => {
   const db = DatabaseFactory.getDatabase();
   try {
     const user = await db.addUser(newUser);
+    res.send(user);
   } catch (error) {
     res.send(error.message);
   }
