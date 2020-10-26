@@ -2,7 +2,7 @@ export type Expense = {
   expense_id: number;
   category_id: number;
   amount: number;
-  Expense_date: Date;
+  expense_date: Date;
   summary: string | null;
 };
 
