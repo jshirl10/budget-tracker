@@ -4,7 +4,7 @@ import { BaseIncome, Income } from '../models/income';
 import { BaseUser, User } from '../models/user';
 
 export interface Database {
-  getUserByEmail(email: String): Promise<User>;
+  loginUser(email: string, passwd: string): Promise<User>;
   getUser(userId: number): Promise<User>;
   getCategories(userId: number): Promise<Category[]>;
   getCategory(categoryId: number): Promise<Category>;

@@ -10,7 +10,7 @@ export class PgDatabase implements Database {
   private static readonly pool = new Pool();
 
   static instance(): PgDatabase {
-    if (this.singleton == null) {
+    if (this.singleton === null) {
       this.singleton = new PgDatabase();
     }
     return this.singleton;
@@ -40,20 +40,85 @@ export class PgDatabase implements Database {
     return transactionResult;
   }
 
-  getUserByEmail(email: String): Promise<User> {
-    throw new Error('Method not implemented.');
+  loginUser(email: string, password: string): Promise<User> {
+    return this.transaction<User>(async (client, commit, rollback) => {
+      try {
+        const queryResults = await client.query<User>({
+          text: `
+            SELECT 
+              users.user_id,
+              CONCAT(users.first_name, ' ', users.last_name) AS full_name,
+              users.email,
+              users.unallocated_funds
+            FROM users
+            WHERE users.email = $1
+              AND users.passwd = $2;`,
+          values: [email, password],
+        });
+        const users = queryResults.rows;
+        if (users.length !== 1) {
+          throw new Error("Credentials don't match");
+        }
+        commit();
+        return users[0];
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
   getUser(userId: number): Promise<User> {
-    throw new Error('Method not implemented.');
+    return this.transaction<User>(async (client, commit, rollback) => {
+      try {
+        const queryResults = await client.query<User>({
+          text: `
+            SELECT *
+            FROM users
+            WHERE user_id = $1;`,
+          values: [userId],
+        });
+        const users = queryResults.rows;
+        if (users.length !== 1) {
+          throw new Error(`User id ${userId} doesn't exist`);
+        }
+        commit();
+        return users[0];
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
+
   getCategories(userId: number): Promise<Category[]> {
     throw new Error('Method not implemented.');
   }
   getCategory(categoryId: number): Promise<Category> {
     throw new Error('Method not implemented.');
   }
+
   getExpenses(userId: number): Promise<Expense[]> {
-    throw new Error('Method not implemented.');
+    return this.transaction<Expense[]>(async (client, commit, rollback) => {
+      try {
+        const queryResults = await client.query<Expense>({
+          text: `
+            SELECT 
+              expenses.summary, 
+              round(expenses.amount::numeric, 2) AS amount_spent, 
+              expenses.expense_date, categories.category_name, 
+              round(categories.amount::numeric, 2) AS total_category_amount 
+            FROM expenses JOIN categories ON expenses.category_id = categories.category_id 
+            WHERE categories.user_id = $1;`,
+          values: [userId],
+        });
+        const expenses = queryResults.rows;
+        commit();
+        return expenses;
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
   getIncomes(userId: number): Promise<Income[]> {
     throw new Error('Method not implemented.');
@@ -63,7 +128,10 @@ export class PgDatabase implements Database {
     return this.transaction<User>(async (client, commit, rollback) => {
       try {
         const queryResult = await client.query<User>({
-          text: 'INSERT INTO users (email, first_name, last_name, passwd) VALUES ($1, $2, $3, $4);',
+          text: `
+            INSERT INTO users (email, first_name, last_name, passwd) 
+            VALUES ($1, $2, $3, $4) 
+            RETURNING *;`,
           values: [email, first_name, last_name, passwd],
         });
         const createdUser = queryResult.rows[0];
@@ -75,12 +143,58 @@ export class PgDatabase implements Database {
       }
     });
   }
+
   editUser(user: User): Promise<User> {
-    throw new Error('Method not implemented.');
+    const { email, first_name, last_name, passwd, user_id } = user;
+    return this.transaction<User>(async (client, commit, rollback) => {
+      try {
+        const queryResult = await client.query<User>({
+          text: `
+            UPDATE users 
+            SET
+              email       = $1,
+              first_name  = $2,
+              last_name   = $3,
+              passwd      = $4
+            WHERE
+              user_id     = $5
+            RETURNING *;`,
+          values: [email, first_name, last_name, passwd, user_id],
+        });
+        const users = queryResult.rows;
+        if (users.length !== 1) {
+          throw new Error(`User ${user_id} could not be updated`);
+        }
+        const updatedUser = queryResult.rows[0];
+        await commit();
+        return updatedUser;
+      } catch (error) {
+        await rollback();
+        throw error;
+      }
+    });
   }
   deleteUser(userId: number): Promise<void> {
-    throw new Error('Method not implemented.');
+    return this.transaction<void>(async (client, commit, rollback) => {
+      try {
+        const queryResult = await client.query({
+          text: `
+            DELETE
+            FROM users
+            WHERE user_id = $1;`,
+          values: [userId],
+        });
+        if (queryResult.rows.length !== 1 || queryResult.rows[0] !== 1) {
+          throw new Error(`User ${userId} could not be deleted`);
+        }
+        commit();
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    });
   }
+
   addCategory(newCategory: BaseCategory): Promise<Category> {
     throw new Error('Method not implemented.');
   }
