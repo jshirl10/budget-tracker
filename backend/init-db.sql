@@ -1,9 +1,13 @@
+-- Create the database
+
 CREATE DATABASE budget_tracker;
 
 -- Make sure to connect to db before proceeding!!!
 -- if using psql on command line, do following cmd:
 -- \c budget_tracker
 
+
+-- Create the tables
 CREATE TABLE IF NOT EXISTS users(
 	user_id	          SERIAL	          NOT NULL  PRIMARY KEY,
 	email	            VARCHAR(30)       NOT NULL  UNIQUE,

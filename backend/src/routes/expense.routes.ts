@@ -1,5 +1,8 @@
 import express from 'express';
 
+/**
+ * A router for all paths beginning with /users/:userId/categories/:categoryId/expenses
+ */
 const expenseRouter = express.Router({ mergeParams: true });
 
 expenseRouter.post('/', (req, res) => {

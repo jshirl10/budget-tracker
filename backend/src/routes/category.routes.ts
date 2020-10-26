@@ -1,5 +1,8 @@
 import express from 'express';
 
+/**
+ * A router for all paths beginning with /users/:userId/categories
+ */
 const categoryRouter = express.Router({ mergeParams: true });
 
 categoryRouter.post('/', (req, res) => {

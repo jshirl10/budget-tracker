@@ -2,6 +2,9 @@ import express from 'express';
 import { DatabaseFactory } from '../database/database-factory';
 import { BaseUser } from '../models/user';
 
+/**
+ * A router for all paths beginning with /users
+ */
 const userRouter = express.Router({ mergeParams: true });
 
 userRouter.post('/', async (req, res) => {

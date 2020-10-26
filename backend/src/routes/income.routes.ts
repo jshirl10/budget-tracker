@@ -1,5 +1,8 @@
 import express from 'express';
 
+/**
+ * A router for all paths beginning with /users/:userId/incomes
+ */
 const incomeRouter = express.Router({ mergeParams: true });
 
 incomeRouter.post('/', (req, res) => {
